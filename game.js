@@ -16,9 +16,12 @@ const gameConfig = {
 const game = new Phaser.Game(gameConfig);
 
 let settingsWindow;
+let backgroundMusic;
 
 function preload() {
     this.load.image('background', './img/background.png');
+    this.load.audio('button-sound', './sounds/settingsAudio.wav');
+    this.load.audio('background-music', './music/theme.wav');
 }
 
 function create() {
@@ -30,19 +33,38 @@ function create() {
     const continueButton = document.getElementById('continue-button');
     const settingsButton = document.getElementById('settings-button');
 
+    [startButton, continueButton, settingsButton].forEach(button => {
+        button.addEventListener('mouseover', () => {
+            button.classList.add('highlight');
+        });
+
+        button.addEventListener('mouseout', () => {
+            button.classList.remove('highlight');
+        });
+
+        createButton(button, playButtonSound);
+    });
+
     startButton.addEventListener('click', startGame);
     continueButton.addEventListener('click', continueGame);
     settingsButton.addEventListener('click', openSettings);
+
+    document.addEventListener('click', playBackgroundMusic);
+}
+
+function createButton(buttonElement, clickHandler) {
+    buttonElement.addEventListener('click', () => {
+        playButtonSound();
+        clickHandler();
+    });
 }
 
 function startGame() {
     console.log('Rozpocznij grę');
-    // Tutaj dodaj kod, który rozpoczyna grę
 }
 
 function continueGame() {
     console.log('Kontynuuj');
-    // Tutaj dodaj kod, który kontynuuje grę
 }
 
 function openSettings() {
@@ -80,8 +102,9 @@ function openSettings() {
     closeButton.style.color = '#fff';
     closeButton.style.fontFamily = "'Press Start 2P', cursive";
     closeButton.style.cursor = 'pointer';
+    closeButton.classList.add('highlight');
 
-    closeButton.addEventListener('click', closeSettings);
+    createButton(closeButton, closeSettings);
 
     settingsWindowElement.appendChild(closeButton);
     document.body.appendChild(settingsWindowElement);
@@ -89,8 +112,20 @@ function openSettings() {
     settingsWindow = settingsWindowElement;
 }
 
-
 function closeSettings() {
     console.log('Zamknij ustawienia');
     settingsWindow.remove();
+}
+
+function playButtonSound() {
+    const buttonSound = new Audio('./sounds/settingsAudio.wav');
+    buttonSound.play();
+}
+
+function playBackgroundMusic() {
+    document.removeEventListener('click', playBackgroundMusic); // Usunięcie nasłuchiwania kliknięcia
+
+    backgroundMusic = game.sound.add('background-music', { loop: true });
+    backgroundMusic.play();
+    backgroundMusic.setVolume(0.1);
 }
