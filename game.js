@@ -17,6 +17,8 @@ const game = new Phaser.Game(gameConfig);
 
 let settingsWindow;
 let backgroundMusic;
+let soundVolume = 0.1;
+let soundSlider;
 
 function preload() {
     this.load.image('background', './img/background.png');
@@ -49,7 +51,15 @@ function create() {
     continueButton.addEventListener('click', continueGame);
     settingsButton.addEventListener('click', openSettings);
 
-    document.addEventListener('click', playBackgroundMusic);
+    backgroundMusic = this.sound.add('background-music');
+    backgroundMusic.play({ loop: true });
+    backgroundMusic.setVolume(soundVolume);
+
+    soundSlider = document.getElementById('sound-slider');
+    soundSlider.addEventListener('input', updateVolume);
+
+    const stopMusicButton = document.getElementById('stop-music-button');
+    stopMusicButton.addEventListener('click', stopMusic);
 }
 
 function createButton(buttonElement, clickHandler) {
@@ -106,10 +116,32 @@ function openSettings() {
 
     createButton(closeButton, closeSettings);
 
+    const soundSliderLabel = document.createElement('label');
+    soundSliderLabel.textContent = 'Głośność:';
+    soundSliderLabel.style.display = 'block';
+    soundSliderLabel.style.marginTop = '16px';
+
+    soundSlider = document.createElement('input');
+    soundSlider.id = 'sound-slider';
+    soundSlider.type = 'range';
+    soundSlider.min = '0';
+    soundSlider.max = '1';
+    soundSlider.step = '0.1';
+    soundSlider.value = soundVolume.toString();
+    soundSlider.addEventListener('input', updateVolume);
+
+    soundSliderLabel.appendChild(soundSlider);
+
+    settingsWindowElement.appendChild(soundSliderLabel);
     settingsWindowElement.appendChild(closeButton);
     document.body.appendChild(settingsWindowElement);
 
     settingsWindow = settingsWindowElement;
+}
+
+function updateVolume() {
+    soundVolume = parseFloat(soundSlider.value);
+    backgroundMusic.setVolume(soundVolume);
 }
 
 function closeSettings() {
@@ -122,10 +154,6 @@ function playButtonSound() {
     buttonSound.play();
 }
 
-function playBackgroundMusic() {
-    document.removeEventListener('click', playBackgroundMusic); // Usunięcie nasłuchiwania kliknięcia
-
-    backgroundMusic = game.sound.add('background-music', { loop: true });
-    backgroundMusic.play();
-    backgroundMusic.setVolume(0.1);
+function stopMusic() {
+    backgroundMusic.stop();
 }
