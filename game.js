@@ -1,70 +1,96 @@
 const gameConfig = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    parent: 'game-container',
+    scale: {
+        mode: Phaser.Scale.FIT,
+        parent: 'game-container',
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: window.innerWidth,
+        height: window.innerHeight
+    },
     scene: {
         preload: preload,
-        create: create,
-        update: update
+        create: create
     }
 };
 
 const game = new Phaser.Game(gameConfig);
 
-let backgroundLayer1;
-let backgroundLayer2;
-let isInMenu = true;
+let settingsWindow;
 
 function preload() {
     this.load.image('background', './img/background.png');
 }
 
 function create() {
-    backgroundLayer1 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'background').setOrigin(0);
-    backgroundLayer2 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'background').setOrigin(0);
+    const background = this.add.image(0, 0, 'background').setOrigin(0);
+    background.displayWidth = game.config.width;
+    background.displayHeight = game.config.height;
 
-    backgroundLayer1.scrollFactorX = 0.3;
-    backgroundLayer1.scrollFactorY = 0.3;
-    backgroundLayer2.scrollFactorX = 0.5;
-    backgroundLayer2.scrollFactorY = 0.5;
+    const startButton = document.getElementById('start-button');
+    const continueButton = document.getElementById('continue-button');
+    const settingsButton = document.getElementById('settings-button');
 
-    const startButton = this.add.dom(400, 250, 'a', 'font-size: 16px', 'Zacznij grę');
-    const continueButton = this.add.dom(400, 300, 'a', 'font-size: 16px', 'Kontynuuj');
-    const settingsButton = this.add.dom(400, 350, 'a', 'font-size: 16px', 'Ustawienia');
-
-    startButton.addListener('click');
-    continueButton.addListener('click');
-    settingsButton.addListener('click');
-
-    startButton.on('click', startGame);
-    continueButton.on('click', continueGame);
-    settingsButton.on('click', openSettings);
-}
-
-function update() {
-    if (isInMenu) {
-        backgroundLayer1.tilePositionX += 0.5;
-        backgroundLayer1.tilePositionY += 0.5;
-        backgroundLayer2.tilePositionX -= 0.3;
-        backgroundLayer2.tilePositionY -= 0.3;
-    }
+    startButton.addEventListener('click', startGame);
+    continueButton.addEventListener('click', continueGame);
+    settingsButton.addEventListener('click', openSettings);
 }
 
 function startGame() {
     console.log('Rozpocznij grę');
     // Tutaj dodaj kod, który rozpoczyna grę
-    isInMenu = false;
 }
 
 function continueGame() {
     console.log('Kontynuuj');
     // Tutaj dodaj kod, który kontynuuje grę
-    isInMenu = false;
 }
 
 function openSettings() {
     console.log('Otwórz ustawienia');
-    // Tutaj dodaj kod, który otwiera ustawienia
-    isInMenu = false;
+    const windowWidth = 400;
+    const windowHeight = 300;
+    const windowX = (game.config.width - windowWidth) / 2;
+    const windowY = (game.config.height - windowHeight) / 2;
+
+    const settingsWindowElement = document.createElement('div');
+    settingsWindowElement.style.width = windowWidth + 'px';
+    settingsWindowElement.style.height = windowHeight + 'px';
+    settingsWindowElement.style.position = 'absolute';
+    settingsWindowElement.style.left = windowX + 'px';
+    settingsWindowElement.style.top = windowY + 'px';
+    settingsWindowElement.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    settingsWindowElement.style.borderRadius = '4px';
+    settingsWindowElement.style.padding = '16px';
+    settingsWindowElement.style.boxSizing = 'border-box';
+    settingsWindowElement.style.fontFamily = "'Press Start 2P', cursive";
+    settingsWindowElement.style.color = '#fff';
+    settingsWindowElement.style.fontSize = '16px';
+
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'Zamknij';
+    closeButton.style.position = 'absolute';
+    closeButton.style.bottom = '16px';
+    closeButton.style.left = '50%';
+    closeButton.style.transform = 'translateX(-50%)';
+    closeButton.style.padding = '8px 12px';
+    closeButton.style.fontSize = '14px';
+    closeButton.style.backgroundColor = '#000';
+    closeButton.style.border = '2px solid #fff';
+    closeButton.style.borderRadius = '4px';
+    closeButton.style.color = '#fff';
+    closeButton.style.fontFamily = "'Press Start 2P', cursive";
+    closeButton.style.cursor = 'pointer';
+
+    closeButton.addEventListener('click', closeSettings);
+
+    settingsWindowElement.appendChild(closeButton);
+    document.body.appendChild(settingsWindowElement);
+
+    settingsWindow = settingsWindowElement;
+}
+
+
+function closeSettings() {
+    console.log('Zamknij ustawienia');
+    settingsWindow.remove();
 }
