@@ -178,7 +178,14 @@ const gameConfig = {
   
     create() {
       // Inicjalizacja gry
-      const infoText = this.add.text(400, 300, 'Gra', { fontSize: '32px', fill: '#fff' });
+      this.cameras.main.setBackgroundColor('#000'); // Ustawia czarne tło
+  
+      const infoText = this.add.text(
+        this.cameras.main.width / 2,
+        this.cameras.main.height / 2,
+        'Gra',
+        { fontSize: '32px', fill: '#fff' }
+      );
       infoText.setOrigin(0.5);
     }
   
