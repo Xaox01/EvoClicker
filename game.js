@@ -13,8 +13,7 @@ const gameConfig = {
   }
 };
 
-const game = new Phaser.Game(gameConfig);
-
+let game;
 let settingsWindow;
 let backgroundMusic;
 let soundVolume = 0.1;
@@ -61,6 +60,12 @@ function create() {
 
   const stopMusicButton = document.getElementById('stop-music-button');
   stopMusicButton.addEventListener('click', stopMusic);
+
+  const params = new URLSearchParams(window.location.search);
+  const inGame = params.get('inGame');
+  if (inGame === 'true') {
+    startGame();
+  }
 }
 
 function createButton(buttonElement, clickHandler) {
@@ -72,11 +77,17 @@ function createButton(buttonElement, clickHandler) {
 
 function startGame() {
   console.log('Rozpocznij grę');
-  if (!game.scene.isActive('gameScene')) {
-    game.scene.stop('menuScene');
-    game.scene.start('gameScene');
-    document.getElementById('menu-container').style.display = 'none';
+  const params = new URLSearchParams(window.location.search);
+  params.set('inGame', 'true');
+  window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+  if (!game) {
+    game = new Phaser.Game(gameConfig);
+    game.scene.add('menuScene', MenuScene);
+    game.scene.add('gameScene', GameScene);
   }
+  game.scene.stop('menuScene');
+  game.scene.start('gameScene');
+  document.getElementById('menu-container').style.display = 'none';
 }
 
 function continueGame() {
@@ -160,18 +171,12 @@ function playButtonSound() {
   buttonSound.play();
 }
 
-function stopMusic() {
-  backgroundMusic.stop();
-}
-
-// Scena menu
 class MenuScene extends Phaser.Scene {
   constructor() {
     super({ key: 'menuScene' });
   }
 }
 
-// Scena gry
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'gameScene' });
@@ -200,7 +205,17 @@ class GameScene extends Phaser.Scene {
   }
 }
 
-// Dodanie scen do gry
-game.scene.add('menuScene', MenuScene);
-game.scene.add('gameScene', GameScene);
-game.scene.start('menuScene');
+window.addEventListener('load', () => {
+  game = new Phaser.Game(gameConfig);
+  game.scene.add('menuScene', MenuScene);
+  game.scene.add('gameScene', GameScene);
+
+  const params = new URLSearchParams(window.location.search);
+  const inGame = params.get('inGame');
+  if (inGame === 'true') {
+    game.scene.start('gameScene');
+    document.getElementById('menu-container').style.display = 'none';
+  } else {
+    game.scene.start('menuScene');
+  }
+});
