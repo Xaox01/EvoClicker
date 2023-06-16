@@ -22,6 +22,7 @@ let soundSlider;
 function preload() {
   this.load.image('background', './img/background.png');
   this.load.image('background2', './img/background2.png');
+  this.load.image('new-object', './sprite/ameba.png'); 
   this.load.audio('button-sound', './sounds/settingsAudio.wav');
   this.load.audio('background-music', './music/theme.wav');
 }
@@ -184,6 +185,7 @@ class GameScene extends Phaser.Scene {
 
   preload() {
     this.load.image('background2', './img/background2.png');
+    this.load.image('new-object', './img/ameba.png'); 
   }
 
   create() {
@@ -191,13 +193,9 @@ class GameScene extends Phaser.Scene {
     background.displayWidth = game.config.width;
     background.displayHeight = game.config.height;
 
-    const infoText = this.add.text(
-      this.cameras.main.width / 2,
-      this.cameras.main.height / 2,
-      'Gra',
-      { fontSize: '32px', fill: '#fff' }
-    );
-    infoText.setOrigin(0.5);
+    const newObject = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'new-object');
+    newObject.setOrigin(0.5);
+    newObject.setDisplaySize(200, 200); 
   }
 
   update() {
