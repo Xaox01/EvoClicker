@@ -22,7 +22,7 @@ let soundSlider;
 function preload() {
   this.load.image('background', './img/background.png');
   this.load.image('background2', './img/background2.png');
-  this.load.image('new-object', './sprite/ameba.png'); 
+  this.load.image('new-object', './img/ameba.png'); 
   this.load.audio('button-sound', './sounds/settingsAudio.wav');
   this.load.audio('background-music', './music/theme.wav');
 }
@@ -181,11 +181,13 @@ class MenuScene extends Phaser.Scene {
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'gameScene' });
+    this.clickCounter = 0; // Inicjalizacja licznika kliknięć
+    this.clickCounterText = null; // Zmienna przechowująca tekst licznika
   }
 
   preload() {
     this.load.image('background2', './img/background2.png');
-    this.load.image('new-object', './img/ameba.png'); 
+    this.load.image('new-object', './sprite/ameba.png'); 
   }
 
   create() {
@@ -195,11 +197,27 @@ class GameScene extends Phaser.Scene {
 
     const newObject = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'new-object');
     newObject.setOrigin(0.5);
-    newObject.setDisplaySize(200, 200); 
+    newObject.setScale(0.5);
+
+
+    this.clickCounterText = this.add.text(10, 10, 'Kliknięcia: 0', {
+      font: '24px Arial',
+      fill: '#ffffff'
+    });
+      //add custom cursor
+      this.input.setDefaultCursor('url(./img/cursor.jpg), pointer');
+
+
+    newObject.setInteractive();
+
+    newObject.on('pointerdown', () => {
+      this.clickCounter++; 
+      this.clickCounterText.setText('Kliknięcia: ' + this.clickCounter); 
+    });
   }
 
   update() {
-    // Logika gry
+
   }
 }
 
