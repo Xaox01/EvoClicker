@@ -22,7 +22,7 @@ let soundSlider;
 function preload() {
   this.load.image('background', './img/background.png');
   this.load.image('background2', './img/background2.png');
-  this.load.image('new-object', './img/ameba.png'); 
+  this.load.image('new-object', './img/ameba.png');
   this.load.audio('button-sound', './sounds/settingsAudio.wav');
   this.load.audio('background-music', './music/theme.wav');
 }
@@ -181,13 +181,16 @@ class MenuScene extends Phaser.Scene {
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'gameScene' });
-    this.clickCounter = 0; // Inicjalizacja licznika kliknięć
-    this.clickCounterText = null; // Zmienna przechowująca tekst licznika
+    this.clickCounter = 0; 
+    this.clickCounterText = null; 
+    this.newObject = null; 
+    this.tween = null; 
   }
 
   preload() {
     this.load.image('background2', './img/background2.png');
-    this.load.image('new-object', './sprite/ameba.png'); 
+    this.load.image('new-object', './sprite/ameba.png');
+    this.load.audio('click-sound', './sounds/settingsAudio.wav');
   }
 
   create() {
@@ -195,29 +198,41 @@ class GameScene extends Phaser.Scene {
     background.displayWidth = game.config.width;
     background.displayHeight = game.config.height;
 
-    const newObject = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'new-object');
-    newObject.setOrigin(0.5);
-    newObject.setScale(0.5);
-
+    this.newObject = this.add.image(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2,
+      'new-object'
+    );
+    this.newObject.setOrigin(0.5);
+    this.newObject.setScale(0.5);
 
     this.clickCounterText = this.add.text(10, 10, 'Kliknięcia: 0', {
       font: '24px Arial',
       fill: '#ffffff'
     });
-      //add custom cursor
-      this.input.setDefaultCursor('url(./img/cursor.jpg), pointer');
 
+    // Add custom cursor
+    this.input.setDefaultCursor('url(./img/cursor.jpg), pointer');
 
-    newObject.setInteractive();
+    this.newObject.setInteractive();
+    this.newObject.on('pointerdown', () => {
+      if (!this.tweens.isTweening(this.newObject)) { 
+        this.clickCounter++;
+        this.clickCounterText.setText('Kliknięcia: ' + this.clickCounter);
+    
+        playClickSound();
+    
 
-    newObject.on('pointerdown', () => {
-      this.clickCounter++; 
-      this.clickCounterText.setText('Kliknięcia: ' + this.clickCounter); 
+        this.tweens.add({
+          targets: this.newObject,
+          y: '+=50', 
+          duration: 200,
+          yoyo: true,
+          repeat: 0
+        });
+      }
     });
-  }
-
-  update() {
-
+    
   }
 }
 
@@ -235,3 +250,8 @@ window.addEventListener('load', () => {
     game.scene.start('menuScene');
   }
 });
+
+function playClickSound() {
+  const clickSound = new Audio('./sounds/settingsAudio.wav');
+  clickSound.play();
+}
