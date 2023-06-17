@@ -181,10 +181,10 @@ class MenuScene extends Phaser.Scene {
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'gameScene' });
-    this.clickCounter = 0; 
-    this.clickCounterText = null; 
-    this.newObject = null; 
-    this.tween = null; 
+    this.clickCounter = 0;
+    this.clickCounterText = null;
+    this.newObject = null;
+    this.tween = null;
   }
 
   preload() {
@@ -206,33 +206,37 @@ class GameScene extends Phaser.Scene {
     this.newObject.setOrigin(0.5);
     this.newObject.setScale(0.5);
 
-    this.clickCounterText = this.add.text(10, 10, 'Kliknięcia: 0', {
-      font: '24px Arial',
-      fill: '#ffffff'
-    });
+    this.clickCounterText = this.add.text(
+      this.cameras.main.width / 2,
+      50,
+      'Kliknięcia: 0',
+      {
+        font: '24px Arial',
+        fill: '#ffffff'
+      }
+    );
+    this.clickCounterText.setOrigin(0.5, 0);
 
     // Add custom cursor
     this.input.setDefaultCursor('url(./img/cursor.jpg), pointer');
 
     this.newObject.setInteractive();
     this.newObject.on('pointerdown', () => {
-      if (!this.tweens.isTweening(this.newObject)) { 
+      if (!this.tweens.isTweening(this.newObject)) {
         this.clickCounter++;
         this.clickCounterText.setText('Kliknięcia: ' + this.clickCounter);
-    
+
         playClickSound();
-    
 
         this.tweens.add({
           targets: this.newObject,
-          y: '+=50', 
-          duration: 200,
+          y: '+=10',
+          duration: 60,
           yoyo: true,
           repeat: 0
         });
       }
     });
-    
   }
 }
 
